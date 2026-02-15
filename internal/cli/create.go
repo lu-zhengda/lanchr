@@ -30,18 +30,12 @@ var (
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Scaffold a new launch agent plist from templates",
-	Long:  "Create a new launch agent plist using built-in templates. Supports simple, interval, calendar, keepalive, and watcher templates.",
+	Long:  "Create a new launch agent plist using built-in templates. Supports simple, interval, calendar, keepalive, watcher, and monitor-* templates.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if createLabel == "" {
-			return fmt.Errorf("--label is required")
-		}
-		if createProgram == "" {
-			return fmt.Errorf("--program is required")
-		}
-
 		var pl plist.LaunchAgentPlist
 
 		// Start from a template if specified.
+		isMonitorTemplate := strings.HasPrefix(createTemplate, "monitor-")
 		if createTemplate != "" {
 			tmpl, err := plist.GetTemplate(createTemplate)
 			if err != nil {
@@ -50,12 +44,32 @@ var createCmd = &cobra.Command{
 			pl = tmpl.Plist
 		}
 
+		// For monitor templates, label defaults to the template name if not provided.
+		if isMonitorTemplate && createLabel == "" {
+			createLabel = fmt.Sprintf("com.lanchr.%s", createTemplate)
+		}
+
+		if createLabel == "" {
+			return fmt.Errorf("--label is required")
+		}
+
+		// For monitor templates, program comes from the template itself.
+		if !isMonitorTemplate && createProgram == "" {
+			return fmt.Errorf("--program is required")
+		}
+
 		// Apply explicit flags (override template defaults).
 		pl.Label = createLabel
-		pl.Program = createProgram
+		if createProgram != "" {
+			pl.Program = createProgram
+		}
 
 		if createArgs != "" {
-			pl.ProgramArguments = append([]string{createProgram}, strings.Split(createArgs, ",")...)
+			prog := createProgram
+			if prog == "" {
+				prog = pl.Program
+			}
+			pl.ProgramArguments = append([]string{prog}, strings.Split(createArgs, ",")...)
 		}
 
 		if createInterval > 0 {
@@ -144,7 +158,7 @@ func init() {
 	createCmd.Flags().StringVar(&createStderr, "stderr", "", "StandardErrorPath")
 	createCmd.Flags().StringVar(&createWorkingDir, "working-dir", "", "WorkingDirectory")
 	createCmd.Flags().StringArrayVar(&createEnv, "env", nil, "Environment variables (KEY=VAL, repeatable)")
-	createCmd.Flags().StringVar(&createTemplate, "template", "", "Built-in template: simple, interval, calendar, keepalive, watcher")
+	createCmd.Flags().StringVar(&createTemplate, "template", "", "Built-in template (simple, interval, calendar, keepalive, watcher, monitor-cpu, monitor-ports, monitor-security, monitor-disk)")
 	createCmd.Flags().StringVarP(&createOutput, "output", "o", "", "Output path (default: ~/Library/LaunchAgents/<label>.plist)")
 	createCmd.Flags().BoolVar(&createLoad, "load", false, "Bootstrap the plist after creation")
 }
