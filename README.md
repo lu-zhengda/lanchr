@@ -1,6 +1,10 @@
 # lanchr
 
-A macOS launch agent/daemon manager — inspect, manage, and troubleshoot launchd services.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform: macOS](https://img.shields.io/badge/Platform-macOS-lightgrey.svg)](https://github.com/lu-zhengda/lanchr)
+[![Homebrew](https://img.shields.io/badge/Homebrew-lu--zhengda/tap-orange.svg)](https://github.com/lu-zhengda/homebrew-tap)
+
+macOS launch agent & daemon manager — inspect, create, and troubleshoot launchd services from the terminal.
 
 ## Install
 
@@ -9,36 +13,79 @@ brew tap lu-zhengda/tap
 brew install lanchr
 ```
 
-## Quick Start
+## Usage
 
-```bash
-lanchr           # Launch interactive TUI
-lanchr --help    # Show all commands
+```
+$ lanchr doctor
+Scanning launch agents and daemons...
+
+2 broken plists found:
+  com.old.service — invalid XML at line 12
+  com.removed.app — binary not found: /usr/local/bin/removed
+
+1 orphaned agent:
+  com.uninstalled.helper — app no longer installed
+
+$ lanchr list --no-apple -s running
+LABEL                        DOMAIN   STATUS    PID
+com.docker.helper            user     running   1234
+org.postgresql               user     running   5678
+com.redis.server             user     running   9012
 ```
 
 ## Commands
 
-| Command   | Description                              |
-|-----------|------------------------------------------|
-| `list`    | List all agents and daemons              |
-| `info`    | Show detailed service information        |
-| `search`  | Search services by name/label            |
-| `enable`  | Enable a service                         |
-| `disable` | Disable a service                        |
-| `logs`    | View service logs                        |
-| `doctor`  | Diagnose service issues                  |
-| `create`  | Create a new launch agent/daemon         |
-| `edit`    | Edit an existing service                 |
-| `restart` | Restart a service                        |
-| `load`    | Load a service                           |
-| `unload`  | Unload a service                         |
+| Command | Description | Example |
+|---------|-------------|---------|
+| `list` | List all services | `lanchr list --no-apple` |
+| `list -d <domain>` | Filter by domain (user/global/system) | `lanchr list -d user` |
+| `list -s <status>` | Filter by status (running/stopped/error) | `lanchr list -s error` |
+| `info <label>` | Detailed service info (all plist keys + runtime) | `lanchr info com.example.myapp` |
+| `search <query>` | Search by label, path, or content | `lanchr search redis` |
+| `enable <label>` | Enable a disabled service (persists) | `lanchr enable com.example.myapp` |
+| `disable <label>` | Disable a service (persists) | `lanchr disable com.example.myapp` |
+| `load <path>` | Bootstrap a plist file | `lanchr load ~/Library/LaunchAgents/com.example.plist` |
+| `unload <label>` | Bootout a service | `lanchr unload com.example.myapp` |
+| `restart <label>` | Force restart a running service | `lanchr restart com.example.myapp` |
+| `logs <label>` | View service logs | `lanchr logs com.example.myapp -f` |
+| `doctor` | Diagnose broken plists and orphaned agents | `lanchr doctor` |
+| `create` | Scaffold a new plist from template | See below |
+| `edit <label>` | Open plist in $EDITOR | `lanchr edit com.example.myapp` |
+
+### Creating Launch Agents
+
+Use `lanchr create` with templates instead of writing plist XML manually:
+
+```bash
+# Simple agent that runs a script at login
+lanchr create -l com.me.backup -p /usr/local/bin/backup.sh --template simple --run-at-load
+
+# Interval-based agent (every 30 minutes)
+lanchr create -l com.me.sync -p /usr/local/bin/sync.sh --template interval --interval 1800
+
+# Calendar-based agent (daily at 9am)
+lanchr create -l com.me.report -p /usr/local/bin/report.sh --template calendar --calendar "Hour=9 Minute=0"
+
+# Keep-alive agent (restart on crash)
+lanchr create -l com.me.server -p /usr/local/bin/server --template keepalive --keep-alive
+
+# File watcher agent
+lanchr create -l com.me.watcher -p /usr/local/bin/process.sh --template watcher
+```
+
+Additional flags: `--stdout <path>`, `--stderr <path>`, `--env KEY=VAL`, `--load` (bootstrap after creation).
+
+## Diagnostic Workflow
+
+1. `lanchr doctor` — identify broken plists, orphaned agents, missing binaries
+2. `lanchr list -s error` — find services in error state
+3. `lanchr logs <label> -f` — follow logs for a specific service
+4. `lanchr restart <label>` — restart a misbehaving service
 
 ## TUI
 
-Launch without arguments for interactive mode. Browse services, filter by domain/status, and manage agents with a keyboard-driven interface.
-
-<!-- Screenshot placeholder: ![lanchr TUI](docs/tui.png) -->
+Launch `lanchr` without arguments for interactive service management. Browse services, filter by domain/status, and manage agents with a keyboard-driven interface.
 
 ## License
 
-MIT
+[MIT](LICENSE)
