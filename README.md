@@ -17,20 +17,29 @@ brew install lanchr
 
 ```
 $ lanchr doctor
-Scanning launch agents and daemons...
+DOCTOR REPORT
+=============
 
-2 broken plists found:
-  com.old.service — invalid XML at line 12
-  com.removed.app — binary not found: /usr/local/bin/removed
+CRITICAL (6)
+  [!] com.apple.cvmsCompAgent_arm64_1: binary not found at /System/Library/...
+      Suggestion: Remove or update the plist to point to a valid binary
+  [!] com.apple.menuextra.battery.helper: binary not found at /System/Library/...
+      Suggestion: Remove or update the plist to point to a valid binary
+  [!] com.apple.knowledgeconstructiond: last exit status: -9
+      Suggestion: Check logs for the service to diagnose the crash
 
-1 orphaned agent:
-  com.uninstalled.helper — app no longer installed
+WARNING (71)
+  [~] com.apple.akd: duplicate label found in 2 plists
+      Suggestion: Remove duplicate plists or use unique labels
+
+Run 'lanchr list' to see all services.
 
 $ lanchr list --no-apple -s running
-LABEL                        DOMAIN   STATUS    PID
-com.docker.helper            user     running   1234
-org.postgresql               user     running   5678
-com.redis.server             user     running   9012
+STATUS  PID     LABEL                                       DOMAIN    BINARY
+  *     27280   com.openssh.ssh-agent                       system    /usr/bin/ssh-agent
+  *     2022    application.com.dwarvesv.minimalbar...      user
+  *     634     application.com.google.Chrome...            user
+  *     76742   application.com.raycast.macos...            user
 ```
 
 ## Commands
