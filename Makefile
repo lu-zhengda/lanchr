@@ -5,7 +5,7 @@ BUILD_DIR  := ./bin
 PREFIX     ?= /usr/local
 VERSION    ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS    := -s -w \
-	-X github.com/zhengda-lu/lanchr/internal/cli.version=$(VERSION)
+	-X github.com/lu-zhengda/lanchr/internal/cli.version=$(VERSION)
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY) ./cmd/lanchr

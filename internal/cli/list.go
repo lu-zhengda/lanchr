@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/zhengda-lu/lanchr/internal/agent"
-	"github.com/zhengda-lu/lanchr/internal/platform"
+	"github.com/lu-zhengda/lanchr/internal/agent"
+	"github.com/lu-zhengda/lanchr/internal/platform"
 )
 
 var (

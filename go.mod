@@ -1,4 +1,4 @@
-module github.com/zhengda-lu/lanchr
+module github.com/lu-zhengda/lanchr
 
 go 1.25.0
 

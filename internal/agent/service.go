@@ -3,7 +3,7 @@ package agent
 import (
 	"strings"
 
-	"github.com/zhengda-lu/lanchr/internal/platform"
+	"github.com/lu-zhengda/lanchr/internal/platform"
 )
 
 // Status represents the runtime state of a service.

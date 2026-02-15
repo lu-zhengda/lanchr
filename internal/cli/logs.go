@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/zhengda-lu/lanchr/internal/logs"
+	"github.com/lu-zhengda/lanchr/internal/logs"
 )
 
 var (

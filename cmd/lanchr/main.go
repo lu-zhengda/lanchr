@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zhengda-lu/lanchr/internal/cli"
+	"github.com/lu-zhengda/lanchr/internal/cli"
 )
 
 func main() {

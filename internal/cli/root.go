@@ -2,14 +2,15 @@ package cli
 
 import (
 	"fmt"
+	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
-	"github.com/zhengda-lu/lanchr/internal/agent"
-	"github.com/zhengda-lu/lanchr/internal/launchctl"
-	"github.com/zhengda-lu/lanchr/internal/platform"
-	"github.com/zhengda-lu/lanchr/internal/plist"
-	"github.com/zhengda-lu/lanchr/internal/tui"
+	"github.com/lu-zhengda/lanchr/internal/agent"
+	"github.com/lu-zhengda/lanchr/internal/launchctl"
+	"github.com/lu-zhengda/lanchr/internal/platform"
+	"github.com/lu-zhengda/lanchr/internal/plist"
+	"github.com/lu-zhengda/lanchr/internal/tui"
 )
 
 var (
@@ -26,9 +27,24 @@ var rootCmd = &cobra.Command{
 		if cmd.Name() == "help" || cmd.Flags().Changed("version") {
 			return nil
 		}
+		if shell, _ := cmd.Root().Flags().GetString("generate-completion"); shell != "" {
+			return nil
+		}
 		return platform.CheckDarwin()
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if shell, _ := cmd.Flags().GetString("generate-completion"); shell != "" {
+			switch shell {
+			case "bash":
+				return cmd.Root().GenBashCompletion(os.Stdout)
+			case "zsh":
+				return cmd.Root().GenZshCompletion(os.Stdout)
+			case "fish":
+				return cmd.Root().GenFishCompletion(os.Stdout, true)
+			default:
+				return fmt.Errorf("unsupported shell: %s (use bash, zsh, or fish)", shell)
+			}
+		}
 		exec := launchctl.NewDefaultExecutor()
 		parser := plist.NewParser()
 		scanner := agent.NewScanner(parser, exec)
@@ -50,6 +66,8 @@ func Execute() error {
 func init() {
 	rootCmd.SetVersionTemplate(fmt.Sprintf("lanchr %s\n", version))
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
+	rootCmd.Flags().String("generate-completion", "", "Generate shell completion (bash, zsh, fish)")
+	rootCmd.Flags().MarkHidden("generate-completion")
 
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(infoCmd)

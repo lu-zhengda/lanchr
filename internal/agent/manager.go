@@ -3,9 +3,9 @@ package agent
 import (
 	"fmt"
 
-	"github.com/zhengda-lu/lanchr/internal/launchctl"
-	"github.com/zhengda-lu/lanchr/internal/platform"
-	"github.com/zhengda-lu/lanchr/internal/plist"
+	"github.com/lu-zhengda/lanchr/internal/launchctl"
+	"github.com/lu-zhengda/lanchr/internal/platform"
+	"github.com/lu-zhengda/lanchr/internal/plist"
 )
 
 // Manager performs lifecycle operations on services.

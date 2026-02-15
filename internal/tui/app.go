@@ -9,9 +9,9 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/zhengda-lu/lanchr/internal/agent"
-	"github.com/zhengda-lu/lanchr/internal/logs"
-	"github.com/zhengda-lu/lanchr/internal/platform"
+	"github.com/lu-zhengda/lanchr/internal/agent"
+	"github.com/lu-zhengda/lanchr/internal/logs"
+	"github.com/lu-zhengda/lanchr/internal/platform"
 )
 
 // viewMode represents which view is currently active.

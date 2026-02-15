@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zhengda-lu/lanchr/internal/agent"
+	"github.com/lu-zhengda/lanchr/internal/agent"
 )
 
 // renderDetailView renders the full info panel for a service.

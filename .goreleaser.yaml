@@ -10,12 +10,14 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/zhengda-lu/lanchr/internal/cli.version={{.Version}}
+      - -X github.com/lu-zhengda/lanchr/internal/cli.version={{.Version}}
 
 archives:
   - formats:
       - tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - completions/*
 
 checksum:
   name_template: "checksums.txt"
@@ -39,6 +41,10 @@ homebrew_casks:
     license: "MIT"
     binaries:
       - lanchr
+    completions:
+      bash: completions/lanchr.bash
+      zsh: completions/lanchr.zsh
+      fish: completions/lanchr.fish
     hooks:
       post:
         install: |
