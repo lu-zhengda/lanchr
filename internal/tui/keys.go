@@ -1,0 +1,30 @@
+package tui
+
+// Key binding constants for the TUI.
+const (
+	keyQuit       = "q"
+	keyUp         = "up"
+	keyDown       = "down"
+	keyK          = "k"
+	keyJ          = "j"
+	keyG          = "g"
+	keyShiftG     = "G"
+	keyTab        = "tab"
+	keyEnter      = "enter"
+	keyEsc        = "esc"
+	keyEnable     = "e"
+	keyDisable    = "x"
+	keyRestart    = "r"
+	keyLogs       = "l"
+	keyLoad       = "L"
+	keyUnload     = "U"
+	keySearch     = "/"
+	keyDomain     = "d"
+	keyStatus     = "s"
+	keyApple      = "a"
+	keyDoctor     = "D"
+	keyHelp       = "?"
+	keyRefresh    = "R"
+	keyCtrlC      = "ctrl+c"
+	keyBackspace  = "backspace"
+)
