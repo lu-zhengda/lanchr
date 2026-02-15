@@ -95,6 +95,10 @@ Additional flags: `--stdout <path>`, `--stderr <path>`, `--env KEY=VAL`, `--load
 
 Launch `lanchr` without arguments for interactive service management. Browse services, filter by domain/status, and manage agents with a keyboard-driven interface.
 
+## Claude Code
+
+Available as a skill in the [macos-toolkit](https://github.com/lu-zhengda/macos-toolkit) Claude Code plugin. Ask Claude "list launch agents" or "debug a daemon" and it runs lanchr automatically.
+
 ## License
 
 [MIT](LICENSE)
