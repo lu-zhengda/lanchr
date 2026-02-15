@@ -81,6 +81,8 @@ func init() {
 	rootCmd.AddCommand(restartCmd)
 	rootCmd.AddCommand(loadCmd)
 	rootCmd.AddCommand(unloadCmd)
+	rootCmd.AddCommand(exportCmd)
+	rootCmd.AddCommand(importCmd)
 }
 
 // buildDeps creates the common dependencies for CLI commands.

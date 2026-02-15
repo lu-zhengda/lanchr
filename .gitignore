@@ -8,5 +8,8 @@ dist/
 # Design plans (local only)
 docs/plans/
 
+# Shell completions
+completions/
+
 # macOS
 .DS_Store
