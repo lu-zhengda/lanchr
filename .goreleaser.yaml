@@ -28,16 +28,20 @@ changelog:
       - "^test:"
       - "^chore:"
 
-brews:
+homebrew_casks:
   - repository:
       owner: lu-zhengda
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    directory: Formula
-    homepage: "https://github.com/zhengda-lu/lanchr"
+    directory: Casks
+    homepage: "https://github.com/lu-zhengda/lanchr"
     description: "A macOS launch agent/daemon manager"
     license: "MIT"
-    install: |
-      bin.install "lanchr"
-    test: |
-      system "#{bin}/lanchr", "--version"
+    binaries:
+      - lanchr
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/lanchr"]
+          end
