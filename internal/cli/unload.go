@@ -19,6 +19,10 @@ var unloadCmd = &cobra.Command{
 			return err
 		}
 
+		if jsonFlag {
+			return printJSON(jsonAction{OK: true, Action: "unload", Label: label})
+		}
+
 		fmt.Printf("Unloaded %s\n", label)
 		return nil
 	},

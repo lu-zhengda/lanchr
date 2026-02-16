@@ -19,6 +19,10 @@ var enableCmd = &cobra.Command{
 			return err
 		}
 
+		if jsonFlag {
+			return printJSON(jsonAction{OK: true, Action: "enable", Label: label})
+		}
+
 		fmt.Printf("Enabled %s\n", label)
 		return nil
 	},

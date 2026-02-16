@@ -24,6 +24,10 @@ var loadCmd = &cobra.Command{
 			return err
 		}
 
+		if jsonFlag {
+			return printJSON(jsonAction{OK: true, Action: "load", Label: plistPath})
+		}
+
 		fmt.Printf("Loaded %s\n", plistPath)
 		return nil
 	},

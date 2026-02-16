@@ -54,22 +54,44 @@ var editCmd = &cobra.Command{
 		// Validate the plist after editing.
 		validateCmd := exec.Command("plutil", "-lint", svc.PlistPath)
 		validateOut, err := validateCmd.CombinedOutput()
-		if err != nil {
-			fmt.Printf("Warning: plist validation failed:\n%s\n", string(validateOut))
-		} else {
-			fmt.Println("Plist validation passed.")
+		validationOK := err == nil
+
+		if !jsonFlag {
+			if !validationOK {
+				fmt.Printf("Warning: plist validation failed:\n%s\n", string(validateOut))
+			} else {
+				fmt.Println("Plist validation passed.")
+			}
 		}
 
 		// Optionally reload.
+		reloaded := false
 		if editReload {
-			fmt.Printf("Reloading %s...\n", label)
+			if !jsonFlag {
+				fmt.Printf("Reloading %s...\n", label)
+			}
 
 			// Bootout then bootstrap.
 			_ = manager.Unload(label)
 			if err := manager.Load(svc.PlistPath); err != nil {
 				return fmt.Errorf("failed to reload service: %w", err)
 			}
-			fmt.Println("Service reloaded.")
+			reloaded = true
+
+			if !jsonFlag {
+				fmt.Println("Service reloaded.")
+			}
+		}
+
+		if jsonFlag {
+			return printJSON(jsonEdit{
+				OK:           true,
+				Action:       "edit",
+				Label:        label,
+				PlistPath:    svc.PlistPath,
+				ValidationOK: validationOK,
+				Reloaded:     reloaded,
+			})
 		}
 
 		return nil

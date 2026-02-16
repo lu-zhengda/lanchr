@@ -19,6 +19,10 @@ var doctorCmd = &cobra.Command{
 			return fmt.Errorf("failed to run doctor: %w", err)
 		}
 
+		if jsonFlag {
+			return printJSON(toJSONDoctor(findings))
+		}
+
 		if len(findings) == 0 {
 			fmt.Println("DOCTOR REPORT")
 			fmt.Println("=============")

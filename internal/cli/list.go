@@ -1,9 +1,7 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -15,7 +13,6 @@ var (
 	listDomain  string
 	listStatus  string
 	listType    string
-	listJSON    bool
 	listNoApple bool
 )
 
@@ -88,8 +85,8 @@ var listCmd = &cobra.Command{
 			filtered = append(filtered, svc)
 		}
 
-		if listJSON {
-			return outputJSON(filtered)
+		if jsonFlag {
+			return printJSON(toJSONServices(filtered))
 		}
 
 		return outputTable(filtered)
@@ -100,7 +97,6 @@ func init() {
 	listCmd.Flags().StringVarP(&listDomain, "domain", "d", "", "Filter by domain: user, global, system")
 	listCmd.Flags().StringVarP(&listStatus, "status", "s", "", "Filter by status: running, stopped, error")
 	listCmd.Flags().StringVarP(&listType, "type", "t", "", "Filter by type: agent, daemon")
-	listCmd.Flags().BoolVar(&listJSON, "json", false, "Output as JSON")
 	listCmd.Flags().BoolVar(&listNoApple, "no-apple", false, "Hide com.apple.* services")
 }
 
@@ -129,37 +125,6 @@ func outputTable(services []agent.Service) error {
 	}
 
 	return nil
-}
-
-type jsonService struct {
-	Label          string `json:"label"`
-	Domain         string `json:"domain"`
-	Type           string `json:"type"`
-	Status         string `json:"status"`
-	PID            int    `json:"pid"`
-	LastExitStatus int    `json:"last_exit_status"`
-	PlistPath      string `json:"plist_path,omitempty"`
-	Program        string `json:"program,omitempty"`
-}
-
-func outputJSON(services []agent.Service) error {
-	var out []jsonService
-	for _, svc := range services {
-		out = append(out, jsonService{
-			Label:          svc.Label,
-			Domain:         svc.Domain.String(),
-			Type:           svc.Type.String(),
-			Status:         svc.Status.String(),
-			PID:            svc.PID,
-			LastExitStatus: svc.LastExitStatus,
-			PlistPath:      svc.PlistPath,
-			Program:        svc.BinaryPath(),
-		})
-	}
-
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	return enc.Encode(out)
 }
 
 // formatProgramArgs joins program arguments for display.

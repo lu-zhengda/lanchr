@@ -63,6 +63,10 @@ var searchCmd = &cobra.Command{
 			}
 		}
 
+		if jsonFlag {
+			return printJSON(toJSONServices(matches))
+		}
+
 		if len(matches) == 0 {
 			fmt.Println("No services found matching query.")
 			return nil

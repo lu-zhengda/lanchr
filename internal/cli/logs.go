@@ -44,6 +44,9 @@ var logsCmd = &cobra.Command{
 			}
 
 			if logsFollow {
+				if jsonFlag {
+					return fmt.Errorf("--json is not supported with --follow")
+				}
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
@@ -63,6 +66,10 @@ var logsCmd = &cobra.Command{
 				return fmt.Errorf("failed to show unified logs: %w", err)
 			}
 
+			if jsonFlag {
+				return printJSON(jsonLogs{Label: label, Source: "unified", Lines: lines})
+			}
+
 			for _, line := range lines {
 				fmt.Println(line)
 			}
@@ -70,6 +77,13 @@ var logsCmd = &cobra.Command{
 		}
 
 		// Use file-based logs.
+		if jsonFlag {
+			if logsFollow {
+				return fmt.Errorf("--json is not supported with --follow")
+			}
+			return logsJSON(label, svc.StandardOutPath, svc.StandardErrorPath, tailer)
+		}
+
 		if !logsStderr && svc.StandardOutPath != "" {
 			fmt.Printf("--- stdout: %s ---\n", svc.StandardOutPath)
 			if logsFollow {
@@ -132,4 +146,33 @@ func init() {
 	logsCmd.Flags().BoolVar(&logsStderr, "stderr", false, "Show only stderr")
 	logsCmd.Flags().BoolVar(&logsStdout, "stdout", false, "Show only stdout")
 	logsCmd.Flags().BoolVar(&logsUnified, "unified", false, "Use macOS unified logging (log show --predicate)")
+}
+
+// logsJSON collects file-based log lines and outputs them as JSON.
+func logsJSON(label, stdoutPath, stderrPath string, tailer *logs.Tailer) error {
+	type logEntry struct {
+		Label  string   `json:"label"`
+		Source string   `json:"source"`
+		Lines  []string `json:"lines"`
+	}
+
+	var entries []logEntry
+
+	if !logsStderr && stdoutPath != "" {
+		lines, err := tailer.Tail(stdoutPath, logsLines)
+		if err != nil {
+			lines = []string{fmt.Sprintf("error: %v", err)}
+		}
+		entries = append(entries, logEntry{Label: label, Source: "stdout", Lines: lines})
+	}
+
+	if !logsStdout && stderrPath != "" {
+		lines, err := tailer.Tail(stderrPath, logsLines)
+		if err != nil {
+			lines = []string{fmt.Sprintf("error: %v", err)}
+		}
+		entries = append(entries, logEntry{Label: label, Source: "stderr", Lines: lines})
+	}
+
+	return printJSON(entries)
 }

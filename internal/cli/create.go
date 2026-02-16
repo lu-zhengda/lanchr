@@ -131,17 +131,33 @@ var createCmd = &cobra.Command{
 			return fmt.Errorf("failed to write plist: %w", err)
 		}
 
-		fmt.Printf("Created %s\n", outputPath)
-
 		// Optionally load the plist.
+		loaded := false
 		if createLoad {
 			_, manager, _ := buildDeps()
 			if err := manager.Load(outputPath); err != nil {
+				if !jsonFlag {
+					fmt.Printf("Created %s\n", outputPath)
+				}
 				return fmt.Errorf("failed to load plist: %w", err)
 			}
-			fmt.Printf("Loaded %s\n", pl.Label)
+			loaded = true
 		}
 
+		if jsonFlag {
+			return printJSON(jsonCreate{
+				OK:        true,
+				Action:    "create",
+				Label:     pl.Label,
+				PlistPath: outputPath,
+				Loaded:    loaded,
+			})
+		}
+
+		fmt.Printf("Created %s\n", outputPath)
+		if loaded {
+			fmt.Printf("Loaded %s\n", pl.Label)
+		}
 		return nil
 	},
 }

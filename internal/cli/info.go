@@ -21,6 +21,10 @@ var infoCmd = &cobra.Command{
 			return fmt.Errorf("failed to get info for %q: %w", label, err)
 		}
 
+		if jsonFlag {
+			return printJSON(toJSONServiceDetail(svc))
+		}
+
 		printField := func(name, value string) {
 			fmt.Printf("%-22s %s\n", name+":", value)
 		}

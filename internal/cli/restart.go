@@ -19,6 +19,10 @@ var restartCmd = &cobra.Command{
 			return err
 		}
 
+		if jsonFlag {
+			return printJSON(jsonAction{OK: true, Action: "restart", Label: label})
+		}
+
 		fmt.Printf("Restarted %s\n", label)
 		return nil
 	},

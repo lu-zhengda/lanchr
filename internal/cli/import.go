@@ -48,17 +48,33 @@ var importCmd = &cobra.Command{
 			return fmt.Errorf("failed to write plist: %w", err)
 		}
 
-		fmt.Printf("Imported %s to %s\n", bundle.Label, outputPath)
-
 		// Optionally load the plist.
+		loaded := false
 		if importLoad {
 			_, manager, _ := buildDeps()
 			if err := manager.Load(outputPath); err != nil {
+				if !jsonFlag {
+					fmt.Printf("Imported %s to %s\n", bundle.Label, outputPath)
+				}
 				return fmt.Errorf("failed to load plist: %w", err)
 			}
-			fmt.Printf("Loaded %s\n", bundle.Label)
+			loaded = true
 		}
 
+		if jsonFlag {
+			return printJSON(jsonImport{
+				OK:        true,
+				Action:    "import",
+				Label:     bundle.Label,
+				PlistPath: outputPath,
+				Loaded:    loaded,
+			})
+		}
+
+		fmt.Printf("Imported %s to %s\n", bundle.Label, outputPath)
+		if loaded {
+			fmt.Printf("Loaded %s\n", bundle.Label)
+		}
 		return nil
 	},
 }
